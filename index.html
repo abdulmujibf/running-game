@@ -2,9 +2,15 @@
 <html>
 
 <head>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <!-- <meta name="viewport" content="width=device-width, initial-scale=1.0" /> -->
+  <meta name="viewport"
+    content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width, height=device-height, target-densitydpi=device-dpi" />
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+    integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
   <style>
     body {
+      width: 100vw;
+      height: 100vh;
       max-height: 100vh;
       margin: 0px;
       overflow: hidden;
@@ -57,37 +63,50 @@
   </style>
 </head>
 
-<body onload="startGame()">
+<body>
   <script>
 
   </script>
+  <div>
+    <button onclick="startGame()">Start</button>
+  </div>
+  <div id="modal" style="display: none; position: absolute; top: 0; width: 100vw; height: 100vh;">
+  </div>
   <div class="game-pad">
     <div class="gamepad">
-      <button class="btn-gamepad" id="up" onmousedown="move('up')" onmouseup="clearmove()"
-        ontouchstart="move('up')">UP</button>
+      <button class="btn-gamepad" id="up" onmousedown="move('up')" onmouseup="clearmove()" ontouchstart="move('up')"
+        ontouchend="">UP</button>
     </div>
     <div class="gamepad-rl gamepad">
-      <button class="btn-gamepad" onmousedown="move('left')" onmouseup="clearmove()"
-        ontouchstart="move('left')">LEFT</button>
-      <button class="btn-gamepad" onmousedown="move('right')" onmouseup="clearmove()"
-        ontouchstart="move('right')">RIGHT</button>
+      <button class="btn-gamepad" onmousedown="move('left')" onmouseup="clearmove()" ontouchstart="move('left')"
+        ontouchend="clearmove()">LEFT</button>
+      <button class="btn-gamepad" onmousedown="move('right')" onmouseup="clearmove()" ontouchstart="move('right')"
+        ontouchend="clearmove()">RIGHT</button>
     </div>
     <div class="gamepad">
-      <button class="btn-gamepad" onmousedown="move('down')" onmouseup="clearmove()"
-        ontouchstart="move('down')">DOWN</button>
+      <button class="btn-gamepad" onmousedown="move('down')" onmouseup="clearmove()" ontouchstart="move('down')"
+        ontouchend="clearmove()">DOWN</button>
     </div>
   </div>
 </body>
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"
   integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
+  integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"
+  integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
+  integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
 <script>
   let myGamePiece;
   let myBackground;
   let myObstacles = [];
   let myScore;
+  let myLive;
   let score = 0;
+  let live = 3
   function removeItemOnce(arr, value) {
-    var index = arr.indexOf(value);
+    let index = arr.indexOf(value);
     if (index > -1) {
       arr.splice(index, 1);
     }
@@ -98,12 +117,15 @@
     console.log("halo")
   })
   function startGame() {
-    myGamePiece = new component(200, 100, "character.png", 10, 120, "image");
+    myGamePiece = new component(200, 100, "character.png", 10, 100, "image");
     myBackground = new component(1530, 718, "bg.png", 0, 0, "background");
     myScore = new component("30px", "Arial", "black", 1330, 40, "text");
+    myLive = new component("30px", "Arial", "black", 10, 40, "text");
     // myObstacle = new component(10, 200, "green", 1000, 200);
     myGameArea.start();
     myScore.text = "SCORE: " + 0;
+    myLive.text = "LIVE: " + live
+    myLive.update();
     myScore.update();
     mySpeed = -1
     spawnObs = 160
@@ -120,6 +142,10 @@
   let myGameArea = {
     canvas: document.createElement("canvas"),
     start: function () {
+      const modal = $("#exampleModal")
+      if (modal) {
+        modal.modal('hide')
+      }
       this.canvas.width = 1534;
       this.canvas.height = 660;
       this.context = this.canvas.getContext("2d");
@@ -149,7 +175,30 @@
     },
     stop: function () {
       clearInterval(this.interval);
-      alert("YOu Lose")
+      this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
+      $("#modal").append(`
+      <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="exampleModalLabel">You Failed</h5>
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            <div class="modal-body">
+              Your Score Is ${score}
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-dismiss="modal" onclick="startGame()">Close</button>
+            </div>
+          </div>
+        </div>
+      </div>`)
+      $("#modal").show()
+      myObstacles = []
+      $("#exampleModal").modal('show')
+      // alert("You Lose")
     }
   }
 
@@ -196,15 +245,15 @@
 
     // Function Hit Objects
     this.crashWith = function (otherobj) {
-      var myleft = this.x;
-      var myright = this.x + (this.width);
-      var mytop = this.y;
-      var mybottom = this.y + (this.height);
-      var otherleft = otherobj.x;
-      var otherright = otherobj.x + (otherobj.width);
-      var othertop = otherobj.y;
-      var otherbottom = otherobj.y + (otherobj.height);
-      var crash = true;
+      let myleft = this.x;
+      let myright = this.x + (this.width);
+      let mytop = this.y;
+      let mybottom = this.y + (this.height);
+      let otherleft = otherobj.x;
+      let otherright = otherobj.x + (otherobj.width);
+      let othertop = otherobj.y;
+      let otherbottom = otherobj.y + (otherobj.height);
+      let crash = true;
       if ((mybottom < othertop) ||
         (mytop > otherbottom) ||
         (myright < otherleft) ||
@@ -233,6 +282,7 @@
     myBackground.update();
     myGamePiece.newPos();
     myGamePiece.update();
+    myLive.update()
 
     myScore.update();
 
@@ -290,11 +340,19 @@
     for (i = 0; i < myObstacles.length; i += 1) {
       myObstacles[i].x += -10;
       myObstacles[i].update();
+      if (myObstacles[i].x < -100 && myObstacles[i].name === "rock") {
+        live--
+        myLive.text = "LIVE: " + live;
+        myObstacles.shift()
+      }
+      if (live === 0) {
+        myGameArea.stop()
+      }
     }
   }
 
   // Score Update
-  myScore.text = "Score: " + myGameArea.frameNo;
+  // myScore.text = "Score: " + myGameArea.frameNo;
 
   function move(dir) {
     // Movement Character
