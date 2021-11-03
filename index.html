@@ -67,7 +67,7 @@
   <script>
 
   </script>
-  <div>
+  <div id="btn">
     <button onclick="startGame()">Start</button>
   </div>
   <div id="modal" style="display: none; position: absolute; top: 0; width: 100vw; height: 100vh;">
@@ -145,6 +145,7 @@
   let myGameArea = {
     canvas: document.createElement("canvas"),
     start: function () {
+      $("body").remove("#btn")
       const modal = $("#exampleModal")
       if (modal) {
         modal.modal('hide')
@@ -334,8 +335,9 @@
     // Multiple Obstacle
     myGameArea.frameNo += 1;
     if (myGameArea.frameNo == 1 || everyinterval(spawnObs)) {
+      const randomHeight = window.outerWidth > 775 ? myGameArea.canvas.height - Math.floor(Math.random() * 500) - 200 : myGameArea.canvas.height - Math.floor(Math.random() * 100) - 100
       x = myGameArea.canvas.width
-      y = myGameArea.canvas.height - Math.floor(Math.random() * 100) - 100
+      y = myGameArea.canvas.height - randomHeight
       let random = Math.floor(Math.random() * 4)
       if (random === 2) {
         console.log('diamond')
