@@ -105,6 +105,7 @@
   let myLive;
   let score = 0;
   let live = 3
+
   function removeItemOnce(arr, value) {
     let index = arr.indexOf(value);
     if (index > -1) {
@@ -117,9 +118,11 @@
     console.log("halo")
   })
   function startGame() {
-    myGamePiece = new component(200, 100, "character.png", 10, 100, "image");
-    myBackground = new component(1530, 718, "bg.png", 0, 0, "background");
-    myScore = new component("30px", "Arial", "black", 1330, 40, "text");
+    const widthPiece = window.outerWidth > 800 ? window.outerWidth / 2 - 600 : window.outerWidth - 700
+    const heightPiece = window.outerHeight > 800 ? window.outerHeight / 2 - 300 : window.outerHeight - 300
+    myGamePiece = new component(widthPiece, heightPiece, "character.png", 10, 100, "image");
+    myBackground = new component(window.outerWidth, window.outerHeight, "bg.png", 0, 0, "background");
+    myScore = new component("30px", "Arial", "black", window.outerWidth - 150, 0 + 40, "text");
     myLive = new component("30px", "Arial", "black", 10, 40, "text");
     // myObstacle = new component(10, 200, "green", 1000, 200);
     myGameArea.start();
@@ -146,8 +149,12 @@
       if (modal) {
         modal.modal('hide')
       }
-      this.canvas.width = 1534;
-      this.canvas.height = 660;
+      // this.canvas.width = 1534;
+      // this.canvas.height = 660;
+      this.canvas.width = window.outerWidth;
+      this.canvas.height = window.outerHeight;
+      // this.canvas.width = window.outerWidth > 775 ? 1543 : 775;
+      // this.canvas.height = window.outerHeight > 775 ? 660 : 335;
       this.context = this.canvas.getContext("2d");
       document.body.insertBefore(this.canvas, document.body.childNodes[0]);
       this.frameNo = 0;
@@ -268,7 +275,8 @@
       this.x += this.speedX;
       this.y += this.speedY;
       if (this.type == "background") {
-        if (this.x == -(this.width)) {
+        console.log(this.x, -this.width)
+        if (this.x < -(this.width)) {
           this.x = 0;
         }
       }
@@ -300,8 +308,8 @@
       if (myGameArea.keys && myGameArea.keys[37]) { myGamePiece.speedX = -3; }
     } else {
       if (myGameArea.x && myGameArea.y) {
-        myGamePiece.x = myGameArea.x - 100;
-        myGamePiece.y = myGameArea.y - 50;
+        myGamePiece.x = myGameArea.x - (window.outerWidth > 775 ? 100 : 40);
+        myGamePiece.y = myGameArea.y - (window.outerWidth > 775 ? 50 : 20);
       }
     }
 
@@ -327,7 +335,7 @@
     myGameArea.frameNo += 1;
     if (myGameArea.frameNo == 1 || everyinterval(spawnObs)) {
       x = myGameArea.canvas.width
-      y = myGameArea.canvas.height - Math.floor(Math.random() * 400) - 150
+      y = myGameArea.canvas.height - Math.floor(Math.random() * 100) - 100
       let random = Math.floor(Math.random() * 4)
       if (random === 2) {
         console.log('diamond')
